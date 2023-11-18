@@ -146,4 +146,4 @@ DJOSER = {
         'user_list': ['rest_framework.permissions.AllowAny'],
         # Другие настройки разрешений...
     }
-    }
+}
