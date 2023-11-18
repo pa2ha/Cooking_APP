@@ -1,15 +1,13 @@
-import webcolors
-from rest_framework import exceptions, serializers
-from recipes.models import (Tag,
-                            Recipe,
-                            Ingredient,
-                            RecipeIngredients,
-                            Favorite,
-                            Shopping_cart)
-from django.core.validators import MinValueValidator
-from users.serializers import CustomUserSerializer
-from django.core.files.base import ContentFile
 import base64
+
+import webcolors
+from django.core.files.base import ContentFile
+from django.core.validators import MinValueValidator
+from rest_framework import exceptions, serializers
+
+from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredients,
+                            Shopping_cart, Tag)
+from users.serializers import CustomUserSerializer
 
 
 class Base64ImageField(serializers.ImageField):

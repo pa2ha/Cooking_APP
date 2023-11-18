@@ -1,23 +1,19 @@
-from rest_framework import exceptions, status, viewsets, filters
-from recipes.models import (Tag,
-                            Recipe,
-                            Ingredient,
-                            Favorite,
-                            Shopping_cart,
-                            RecipeIngredients)
-from .serializers import (TagSerializer,
-                          IngredientsSerializer,
-                          RecipeCreateUpdateSerializer,
-                          RecipeSerializer,
-                          FavoriteSerializer)
+from django.db.models import Sum
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+from rest_framework import exceptions, filters, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from django.http import HttpResponse
+
+from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredients,
+                            Shopping_cart, Tag)
 from users.pagination import CustomPageNumberPagination
-from .permissions import IsAuthorOrAdminPermission
+
 from .filters import RecipeFilter
-from django.db.models import Sum
+from .permissions import IsAuthorOrAdminPermission
+from .serializers import (FavoriteSerializer, IngredientsSerializer,
+                          RecipeCreateUpdateSerializer, RecipeSerializer,
+                          TagSerializer)
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):

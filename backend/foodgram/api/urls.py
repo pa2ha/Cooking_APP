@@ -1,11 +1,11 @@
-from django.urls import include, path
-from django.conf.urls.static import static
-from rest_framework.routers import DefaultRouter
 from django.conf import settings
-from users.views import CustomUserViewSet
+from django.conf.urls.static import static
+from django.urls import include, path
+from rest_framework.routers import DefaultRouter
 
-from .views import TagViewSet, IngredientsViewSet, RecipesViewSet
-from users.views import custom_obtain_auth_token
+from users.views import CustomUserViewSet, custom_obtain_auth_token
+
+from .views import IngredientsViewSet, RecipesViewSet, TagViewSet
 
 v1_router = DefaultRouter()
 v1_router.register('tags', TagViewSet)
