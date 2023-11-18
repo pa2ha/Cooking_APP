@@ -150,8 +150,7 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
                 ingredient = Ingredient.objects.get(pk=ingredient_id)
             except Ingredient.DoesNotExist:
                 raise exceptions.ValidationError(
-                    f'Ингредиент с id {ingredient_id} не найден.'
-                    )
+                    f'Ингредиент с id {ingredient_id} не найден.')
 
             RecipeIngredients.objects.create(
                 recipe=recipe,
@@ -164,15 +163,13 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
         tags = validated_data.pop('tags', None)
         if tags is None:
             raise exceptions.ValidationError(
-                'Необходимо предоставить теги для обновления рецепта.'
-                )
+                'Необходимо предоставить теги для обновления рецепта.')
         if tags is not None:
             instance.tags.set(tags)
         ingredients = validated_data.pop('ingredients', None)
         if ingredients is None:
             raise exceptions.ValidationError(
-                'Необходимо предоставить ингредиенты для обновления рецепта.'
-                )
+                'Необходимо предоставить ингредиенты для обновления рецепта.')
 
         instance.ingredients.clear()
         for ingredient in ingredients:
@@ -216,8 +213,7 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
             for ingredient in ingredients:
                 if ingredients.count(ingredient) > 1:
                     raise exceptions.ValidationError(
-                        'У рецепта не может быть два одинаковых ингредиента.'
-                        )
+                        'У рецепта не может быть два одинаковых ингредиента.')
         return value
 
     def to_representation(self, instance):

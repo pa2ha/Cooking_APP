@@ -20,4 +20,4 @@ class Command(BaseCommand):
                         f"Запись успешно добавлена: {row}"))
                 except Exception as error:
                     self.stdout.write(self.style.ERROR(
-                            f'Ошибка в строке {row}: {error}'))
+                        f'Ошибка в строке {row}: {error}'))

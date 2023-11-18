@@ -60,7 +60,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
             except Recipe.DoesNotExist:
                 raise exceptions.ValidationError(
                     f'Рецепт с id {pk} не найден.'
-                    )
+                )
 
             if Favorite.objects.filter(
                 user=user,
@@ -111,7 +111,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
             ).exists():
                 raise exceptions.ValidationError(
                     'Рецепт уже в списке покупок.'
-                    )
+                )
 
             Shopping_cart.objects.create(user=user, recipe=recipe)
             serializer = FavoriteSerializer(
