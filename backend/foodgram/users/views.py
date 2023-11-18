@@ -1,19 +1,18 @@
-from rest_framework import exceptions, status, viewsets
-from .serializers import (CustomUserSerializer,
-                          CustomUserCreateSerializer,
-                          ChangePasswordSerializer,
-                          SubscriptionSerializer,
-                          UserLoginSerializer)
 from django.contrib.auth import get_user_model
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from .models import Subscription
 from django.shortcuts import get_object_or_404
-from rest_framework.permissions import (IsAuthenticated,
-                                        AllowAny)
-from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework import exceptions, status, viewsets
 from rest_framework.authtoken.models import Token
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.decorators import action
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
+
+from .models import Subscription
 from .pagination import CustomPageNumberPagination
+from .serializers import (ChangePasswordSerializer, CustomUserCreateSerializer,
+                          CustomUserSerializer, SubscriptionSerializer,
+                          UserLoginSerializer)
+
 User = get_user_model()
 
 

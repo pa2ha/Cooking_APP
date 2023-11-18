@@ -17,7 +17,7 @@ class Command(BaseCommand):
                     item.full_clean()
                     item.save()
                     self.stdout.write(self.style.SUCCESS(
-                        f"Запись для модели Ingredient успешно добавлена: {row}"))
+                        f"Запись успешно добавлена: {row}"))
                 except Exception as error:
                     self.stdout.write(self.style.ERROR(
                             f'Ошибка в строке {row}: {error}'))
