@@ -1,10 +1,10 @@
 from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from rest_framework import serializers
 
 from recipes.models import Recipe
-
-from .models import Subscription
+from users.models import Subscription
 
 User = get_user_model()
 
@@ -66,7 +66,22 @@ class SubscriptionSerializer(CustomUserSerializer):
 
     def get_recipes(self, obj):
         recipes = Recipe.objects.filter(author=obj)
-        return SubRecipesSerializer(recipes, many=True).data
+
+        recipes_limit = self.context.get(
+            'request').query_params.get('recipes_limit')
+        if recipes_limit and recipes_limit.isdigit():
+            recipes_limit = int(recipes_limit)
+            recipes = recipes[:recipes_limit]
+
+        if recipes:
+            serializer = SubRecipesSerializer(
+                recipes,
+                context={'request': self.context.get('request')},
+                many=True
+            )
+            return serializer.data
+
+        return []
 
     def get_recipes_count(self, obj):
         return Recipe.objects.filter(author=obj).count()
@@ -74,10 +89,31 @@ class SubscriptionSerializer(CustomUserSerializer):
     def to_representation(self, instance):
         data = super().to_representation(instance)
         request = self.context.get('request', None)
-        if request:
-            limit = request.query_params.get('recipes_limit')
-            if limit is not None and limit.isdigit():
-                data['recipes'] = data['recipes'][:int(limit)]
+        limit = request.query_params.get('recipes_limit') if request else None
+        data['recipes'] = data.get(
+            'recipes', {}) if limit and limit.isdigit() else data['recipes']
+        return data
+
+    def validate(self, data):
+        user = self.context['request'].user
+        author_id = self.context['request'].data.get('id')
+        author = get_object_or_404(User, pk=author_id)
+
+        if user == author:
+            raise serializers.ValidationError(
+                'Подписка на самого себя запрещена.')
+
+        if Subscription.objects.filter(user=user, author=author).exists():
+            raise serializers.ValidationError('Подписка уже оформлена.')
+
+        # Проверка наличия подписки перед удалением
+        if self.context['request'].method == 'DELETE':
+            if not Subscription.objects.filter(
+                user=user, author=author).exists(
+            ):
+                raise serializers.ValidationError(
+                    'Подписка не была оформлена, либо уже удалена.')
+
         return data
 
     class Meta:
@@ -102,3 +138,46 @@ class UserLoginSerializer(serializers.Serializer):
                 'Неверный email/password')
         raise serializers.ValidationError(
             'Укажите email и password')
+
+
+class SubscriptionCreateSerializer(serializers.Serializer):
+    author_id = serializers.IntegerField()
+
+    def validate_author_id(self, value):
+        request = self.context.get('request')
+        user = request.user
+
+        if user.id == value:
+            raise serializers.ValidationError(
+                'Зачем подписываться самому на себя?.')
+
+        return value
+
+    def validate(self, data):
+        user = self.context['request'].user
+        author_id = data.get('author_id')
+        author = get_object_or_404(User, pk=author_id)
+
+        if user == author:
+            raise serializers.ValidationError(
+                'Подписка на самого себя запрещена.')
+
+        if Subscription.objects.filter(user=user, author=author).exists():
+            if self.context['request'].method == 'POST':
+                raise serializers.ValidationError('Подписка уже оформлена.')
+
+        if self.context['request'].method == 'DELETE':
+            if not Subscription.objects.filter(
+                user=user, author=author).exists(
+            ):
+                raise serializers.ValidationError(
+                    'Подписка не была оформлена, либо уже удалена.')
+
+        return data
+
+    def to_representation(self, instance):
+        serializer = SubscriptionSerializer(
+            instance,
+            context={'request': self.context.get('request')}
+        )
+        return serializer.data

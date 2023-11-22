@@ -3,6 +3,7 @@ import base64
 import webcolors
 from django.core.files.base import ContentFile
 from django.core.validators import MinValueValidator
+from django.shortcuts import get_object_or_404
 from rest_framework import exceptions, serializers
 
 from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredients,
@@ -47,20 +48,11 @@ class IngredientsSerializer(serializers.ModelSerializer):
 
 
 class RecipeIngredientsSerializer(serializers.ModelSerializer):
-    id = serializers.SerializerMethodField(method_name='get_id')
-    name = serializers.SerializerMethodField(method_name='get_name')
-    measurement_unit = serializers.SerializerMethodField(
-        method_name='get_measurement_unit'
+    id = serializers.IntegerField(source='ingredient.id')
+    name = serializers.CharField(source='ingredient.name')
+    measurement_unit = serializers.CharField(
+        source='ingredient.measurement_unit'
     )
-
-    def get_id(self, obj):
-        return obj.ingredient.id
-
-    def get_name(self, obj):
-        return obj.ingredient.name
-
-    def get_measurement_unit(self, obj):
-        return obj.ingredient.measurement_unit
 
     class Meta:
         model = RecipeIngredients
@@ -99,10 +91,14 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def get_is_favorited(self, obj):
         user = self.context.get('request').user
+        if user.is_anonymous:
+            return False
         return Favorite.objects.filter(user=user, recipe=obj).exists()
 
     def get_in_shopping_cart(self, obj):
         user = self.context.get('request').user
+        if user.is_anonymous:
+            return False
         return Shopping_cart.objects.filter(user=user, recipe=obj).exists()
 
     def get_ingredients(self, obj):
@@ -233,3 +229,115 @@ class FavoriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = ('id', 'name', "image", "cooking_time")
+
+
+class FavoriteCreateSerializer(serializers.Serializer):
+    recipe_id = serializers.IntegerField()
+
+    def validate_recipe_id(self, value):
+        user = self.context['request'].user
+
+        try:
+            recipe = Recipe.objects.get(pk=value)
+        except Recipe.DoesNotExist:
+            raise serializers.ValidationError(f'Рецепт с id {value} не найден')
+
+        if Favorite.objects.filter(user=user, recipe=recipe).exists():
+            raise serializers.ValidationError('Рецепт уже в избранном.')
+
+        return value
+
+    def create(self, validated_data):
+        user = self.context['request'].user
+        recipe_id = validated_data['recipe_id']
+
+        try:
+            recipe = Recipe.objects.get(pk=recipe_id)
+        except Recipe.DoesNotExist:
+            raise serializers.ValidationError(
+                f'Рецепт с id {recipe_id} не найден')
+
+        favorite = Favorite.objects.create(user=user, recipe=recipe)
+        self.recipe_instance = recipe
+        return favorite
+
+    def to_representation(self, instance):
+        serializer = FavoriteSerializer(
+            self.recipe_instance,
+            context={'request': self.context.get('request')}
+        )
+        return serializer.data
+
+
+class FavoriteDeleteSerializer(serializers.Serializer):
+    recipe_id = serializers.IntegerField()
+
+    def validate_recipe_id(self, value):
+        recipe = get_object_or_404(Recipe, pk=value)
+        user = self.context['request'].user
+        if not Favorite.objects.filter(user=user, recipe=recipe).exists():
+            raise serializers.ValidationError(
+                'Рецепта нет в избранном, либо он уже удален.')
+        return value
+
+    def delete(self, instance):
+        user = self.context['request'].user
+        recipe = get_object_or_404(Recipe, pk=instance['recipe_id'])
+        favorite = Favorite.objects.get(user=user, recipe=recipe)
+        favorite.delete()
+
+
+class ShoppingCartCreateSerializer(serializers.Serializer):
+    recipe_id = serializers.IntegerField()
+
+    def validate_recipe_id(self, value):
+        try:
+            recipe = Recipe.objects.get(pk=value)
+        except Recipe.DoesNotExist:
+            raise serializers.ValidationError(f'Рецепт с id {value} не найден')
+        user = self.context['request'].user
+        if Shopping_cart.objects.filter(user=user, recipe=recipe).exists():
+            raise serializers.ValidationError('Рецепт уже в списке покупок.')
+        self.recipe_instance = recipe
+        return value
+
+    def create(self, validated_data):
+        user = self.context['request'].user
+        recipe_id = validated_data['recipe_id']
+
+        try:
+            recipe = Recipe.objects.get(pk=recipe_id)
+        except Recipe.DoesNotExist:
+            raise serializers.ValidationError(
+                f'Рецепт с id {recipe_id} не найден')
+
+        shopping_cart = Shopping_cart.objects.create(user=user, recipe=recipe)
+        return shopping_cart
+
+    def to_representation(self, instance):
+        serializer = FavoriteSerializer(
+            self.recipe_instance,
+            context={'request': self.context.get('request')}
+        )
+        return serializer.data
+
+
+class ShoppingCartDeleteSerializer(serializers.Serializer):
+    recipe_id = serializers.IntegerField()
+
+    def validate_recipe_id(self, value):
+
+        recipe = get_object_or_404(Recipe, pk=value)
+        user = self.context['request'].user
+        if not Shopping_cart.objects.filter(user=user, recipe=recipe).exists():
+            raise serializers.ValidationError(
+                'Рецепта нет в списке покупок, либо он уже удален.')
+        return value
+
+    def delete(self, instance):
+        user = self.context['request'].user
+        recipe = get_object_or_404(Recipe, pk=instance['recipe_id'])
+        shopping_cart = get_object_or_404(
+            Shopping_cart, user=user,
+            recipe=recipe)
+        shopping_cart.delete()

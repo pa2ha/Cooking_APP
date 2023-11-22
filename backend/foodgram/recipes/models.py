@@ -1,3 +1,4 @@
+from colorfield.fields import ColorField
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from django.db import models
@@ -11,7 +12,7 @@ class Tag(models.Model):
         unique=True,
         verbose_name='Название тега',
     )
-    color = models.CharField(
+    color = ColorField(
         max_length=7,
         unique=True,
         verbose_name='Цвет для тега',
@@ -25,6 +26,7 @@ class Tag(models.Model):
     class Meta:
         verbose_name = 'тег'
         verbose_name_plural = 'теги'
+        ordering = ('name',)
 
     def __str__(self):
         return self.name
@@ -43,6 +45,7 @@ class Ingredient(models.Model):
     class Meta:
         verbose_name = 'ингредиент'
         verbose_name_plural = 'ингредиенты'
+        ordering = ('name',)
 
     def __str__(self):
         return self.name
@@ -93,6 +96,7 @@ class Recipe(models.Model):
         ordering = ('-pub_date',)
         verbose_name = 'рецепт'
         verbose_name_plural = 'Рецепты'
+        ordering = ('name',)
 
     def __str__(self):
         return self.name
@@ -116,6 +120,7 @@ class RecipeIngredients(models.Model):
 
     class Meta:
         verbose_name = 'ингредиенты'
+        ordering = ('recipe',)
 
     def __str__(self):
         return f'В рецепте {self.recipe} есть ингредиент {self.ingredient}'
@@ -138,6 +143,7 @@ class Favorite(models.Model):
     class Meta:
         verbose_name = 'избранное'
         verbose_name_plural = 'Избранное'
+        ordering = ('user',)
 
     def __str__(self):
         return f'Рецепт {self.recipe} в избранном у {self.user}'
@@ -160,6 +166,7 @@ class Shopping_cart(models.Model):
     class Meta:
         verbose_name = 'Список покупок'
         verbose_name_plural = 'Списки Покупок'
+        ordering = ('user',)
 
     def __str__(self):
         return f'Рецепт {self.recipe} в избранном у {self.user}'

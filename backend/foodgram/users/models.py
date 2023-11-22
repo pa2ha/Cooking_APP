@@ -21,6 +21,7 @@ class Subscription(models.Model):
     class Meta:
         verbose_name = 'подписка'
         verbose_name_plural = 'Подписки'
+        ordering = ('user',)
 
     def __str__(self):
         return f'Подписка {self.user} на {self.author}'
