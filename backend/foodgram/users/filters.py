@@ -14,7 +14,7 @@ class UserFilter(django_filters.FilterSet):
     def filter_recipes_limit(self, queryset, name, value):
         # Фильтруем пользователей по количеству рецептов
         queryset = queryset.annotate(recipes_count=Count('recipes'))
-        
+
         # Проверяем, что recipes_count существует перед фильтрацией
         if 'recipes_count' in queryset.model.__dict__:
             queryset = queryset.filter(recipes_count__lte=value)
