@@ -40,7 +40,6 @@ class RecipeFilter(rest_framework.FilterSet):
         fields = ('author', 'tags', 'is_favorited', 'is_in_shopping_cart')
 
 
-
 class IngredientsFilter(filters.FilterSet):
     name = filters.CharFilter(
         field_name='name',

@@ -95,7 +95,8 @@ class RecipesViewSet(viewsets.ModelViewSet):
             FavoriteDeleteSerializer,
             serializer_data, status.HTTP_204_NO_CONTENT, request)
 
-    @action(detail=True, permission_classes=[IsAuthenticated], methods=['POST'])
+    @action(detail=True,
+            permission_classes=[IsAuthenticated], methods=['POST'])
     def shopping_cart(self, request, pk=None):
         serializer_data = self.get_serializer_data(pk)
         return self.handle_create_request(
