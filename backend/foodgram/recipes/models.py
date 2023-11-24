@@ -96,7 +96,6 @@ class Recipe(models.Model):
         ordering = ('-pub_date',)
         verbose_name = 'рецепт'
         verbose_name_plural = 'Рецепты'
-        ordering = ('name',)
 
     def __str__(self):
         return self.name

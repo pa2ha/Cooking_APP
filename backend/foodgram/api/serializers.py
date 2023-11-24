@@ -131,6 +131,26 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
         )
     )
 
+    def create_or_update_ingredients(self, instance, ingredients):
+        recipe_ingredients = []
+
+        for ingredient in ingredients:
+            amount = ingredient['amount']
+            ingredient_id = ingredient['id']
+            ingredient_obj = Ingredient.objects.filter(
+                pk=ingredient_id).first()
+            if not ingredient_obj:
+                raise serializers.ValidationError(
+                    f'Ингредиент с id {ingredient_id} не найден.')
+            recipe_ingredients.append(
+                RecipeIngredients(
+                    recipe=instance,
+                    ingredient=ingredient_obj,
+                    amount=amount
+                )
+            )
+        RecipeIngredients.objects.bulk_create(recipe_ingredients)
+
     def create(self, validated_data):
         author = self.context.get('request').user
         tags = validated_data.pop('tags')
@@ -139,20 +159,8 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
         recipe = Recipe.objects.create(author=author, **validated_data)
         recipe.tags.set(tags)
 
-        for ingredient in ingredients:
-            amount = ingredient['amount']
-            ingredient_id = ingredient['id']
-            try:
-                ingredient = Ingredient.objects.get(pk=ingredient_id)
-            except Ingredient.DoesNotExist:
-                raise exceptions.ValidationError(
-                    f'Ингредиент с id {ingredient_id} не найден.')
+        self.create_or_update_ingredients(recipe, ingredients)
 
-            RecipeIngredients.objects.create(
-                recipe=recipe,
-                ingredient=ingredient,
-                amount=amount
-            )
         return recipe
 
     def update(self, instance, validated_data):
@@ -162,28 +170,13 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
                 'Необходимо предоставить теги для обновления рецепта.')
         if tags is not None:
             instance.tags.set(tags)
+
         ingredients = validated_data.pop('ingredients', None)
         if ingredients is None:
             raise exceptions.ValidationError(
                 'Необходимо предоставить ингредиенты для обновления рецепта.')
 
-        instance.ingredients.clear()
-        for ingredient in ingredients:
-            amount = ingredient['amount']
-            ingredient_id = ingredient['id']
-
-            try:
-                ingredient_obj = Ingredient.objects.get(pk=ingredient_id)
-            except Ingredient.DoesNotExist:
-                raise serializers.ValidationError(
-                    f'Ингредиент с id {ingredient_id} не найден.'
-                )
-
-            RecipeIngredients.objects.update_or_create(
-                recipe=instance,
-                ingredient=ingredient_obj,
-                defaults={'amount': amount}
-            )
+        self.create_or_update_ingredients(instance, ingredients)
 
         return super().update(instance, validated_data)
 
@@ -237,9 +230,8 @@ class FavoriteCreateSerializer(serializers.Serializer):
     def validate_recipe_id(self, value):
         user = self.context['request'].user
 
-        try:
-            recipe = Recipe.objects.get(pk=value)
-        except Recipe.DoesNotExist:
+        recipe = Recipe.objects.filter(pk=value).first()
+        if not recipe:
             raise serializers.ValidationError(f'Рецепт с id {value} не найден')
 
         if Favorite.objects.filter(user=user, recipe=recipe).exists():
@@ -250,13 +242,10 @@ class FavoriteCreateSerializer(serializers.Serializer):
     def create(self, validated_data):
         user = self.context['request'].user
         recipe_id = validated_data['recipe_id']
-
-        try:
-            recipe = Recipe.objects.get(pk=recipe_id)
-        except Recipe.DoesNotExist:
+        recipe = Recipe.objects.filter(pk=recipe_id).first()
+        if not recipe:
             raise serializers.ValidationError(
                 f'Рецепт с id {recipe_id} не найден')
-
         favorite = Favorite.objects.create(user=user, recipe=recipe)
         self.recipe_instance = recipe
         return favorite
@@ -291,9 +280,8 @@ class ShoppingCartCreateSerializer(serializers.Serializer):
     recipe_id = serializers.IntegerField()
 
     def validate_recipe_id(self, value):
-        try:
-            recipe = Recipe.objects.get(pk=value)
-        except Recipe.DoesNotExist:
+        recipe = Recipe.objects.filter(pk=value).first()
+        if not recipe:
             raise serializers.ValidationError(f'Рецепт с id {value} не найден')
         user = self.context['request'].user
         if Shopping_cart.objects.filter(user=user, recipe=recipe).exists():
@@ -304,13 +292,10 @@ class ShoppingCartCreateSerializer(serializers.Serializer):
     def create(self, validated_data):
         user = self.context['request'].user
         recipe_id = validated_data['recipe_id']
-
-        try:
-            recipe = Recipe.objects.get(pk=recipe_id)
-        except Recipe.DoesNotExist:
+        recipe = Recipe.objects.filter(pk=recipe_id).first()
+        if not recipe:
             raise serializers.ValidationError(
                 f'Рецепт с id {recipe_id} не найден')
-
         shopping_cart = Shopping_cart.objects.create(user=user, recipe=recipe)
         return shopping_cart
 
