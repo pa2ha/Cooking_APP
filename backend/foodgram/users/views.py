@@ -6,15 +6,13 @@ from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-
 from users.models import Subscription
 from users.pagination import CustomPageNumberPagination
 from users.serializers import (ChangePasswordSerializer,
                                CustomUserCreateSerializer,
                                CustomUserSerializer,
                                SubscriptionCreateSerializer,
-                               SubscriptionSerializer,
-                               UserLoginSerializer)
+                               SubscriptionSerializer, UserLoginSerializer)
 
 User = get_user_model()
 
@@ -40,7 +38,6 @@ class CustomUserViewSet(viewsets.ModelViewSet):
     def set_password(self, request, pk=None):
         user = self.request.user
         serializer = ChangePasswordSerializer(data=request.data)
-
         if serializer.is_valid():
             if not user.check_password(
                 serializer.data.get("current_password")
@@ -51,9 +48,8 @@ class CustomUserViewSet(viewsets.ModelViewSet):
             user.save()
 
             return Response(status=status.HTTP_204_NO_CONTENT)
-        else:
-            return Response(serializer.errors,
-                            status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors,
+                        status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=[IsAuthenticated])
