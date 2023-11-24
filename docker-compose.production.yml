@@ -14,7 +14,7 @@ services:
       - pg_data:/var/lib/postgresql/data
       
   backend:
-    build: ./backend/foodgram/
+    image: pa2ha/foodgram-backend:latest
     env_file: .env
     volumes:
       - STATIC:/backend_static
@@ -23,12 +23,12 @@ services:
 
   frontend:
     env_file: .env
-    build: ./frontend/
+    image: pa2ha/foodgram-frontend:latest
     command: cp -r /app/build/. /static/
     volumes:
       - STATIC:/static   
   gateway:
-    build: ./ngnix/
+    image: pa2ha/foodgram_gateway:latest
     env_file: .env
     volumes:
       - STATIC:/staticfiles
