@@ -1,9 +1,11 @@
-name:  Main Foodgram
+name:  Main Foodgram workflow
 
 on:
   push:
     branches:
       - main
+    paths-ignore:
+      - '**/README.md'
 
 jobs:
 
