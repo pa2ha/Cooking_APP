@@ -4,6 +4,7 @@ volumes:
   pg_data:
   STATIC:
   MEDIA:
+  REDOC:
 
 services:
   db:
@@ -11,12 +12,14 @@ services:
     env_file: .env
     volumes:
       - pg_data:/var/lib/postgresql/data
+      
   backend:
     build: ./backend/foodgram/
     env_file: .env
     volumes:
       - STATIC:/backend_static
       - MEDIA:/media/
+      - REDOC:/app/docs/
 
   frontend:
     env_file: .env
@@ -30,5 +33,6 @@ services:
     volumes:
       - STATIC:/staticfiles
       - MEDIA:/media/
+      - REDOC:/usr/share/nginx/html/api/docs/
     ports:
       - 8080:80
