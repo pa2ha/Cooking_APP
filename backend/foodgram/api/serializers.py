@@ -4,9 +4,10 @@ import webcolors
 from django.core.files.base import ContentFile
 from django.core.validators import MinValueValidator
 from django.shortcuts import get_object_or_404
+from rest_framework import exceptions, serializers
+
 from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredients,
                             Shopping_cart, Tag)
-from rest_framework import exceptions, serializers
 from users.serializers import CustomUserSerializer
 
 
