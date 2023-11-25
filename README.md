@@ -135,7 +135,7 @@ SECRET_KEY='секретный ключ Django'
 - Создать и запустить контейнеры Docker, последовательно выполнить команды по созданию миграций, сбору статики, 
 созданию суперпользователя, как указано выше.
 ```
-docker-compose -f docker-compose-local.yml up -d
+docker-compose -f docker-compose.yml up -d
 ```
 
 
