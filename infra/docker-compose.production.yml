@@ -10,12 +10,14 @@ services:
   db:
     image: postgres:13
     env_file: .env
+    restart: on-failure
     volumes:
       - pg_data:/var/lib/postgresql/data
       
   backend:
     image: pa2ha/foodgram-backend:latest
     env_file: .env
+    restart: on-failure
     volumes:
       - STATIC:/backend_static
       - MEDIA:/media/
@@ -23,16 +25,19 @@ services:
 
   frontend:
     env_file: .env
+    restart: no
     image: pa2ha/foodgram-frontend:latest
     command: cp -r /app/build/. /static/
     volumes:
-      - STATIC:/static   
+      - STATIC:/static 
+  
   gateway:
     image: pa2ha/foodgram_gateway:latest
     env_file: .env
+    restart: on-failure
     volumes:
       - STATIC:/staticfiles
       - MEDIA:/media/
       - REDOC:/usr/share/nginx/html/api/docs/
     ports:
-      - 8080:80
+      - ${EXTERNAL_PORT}:80

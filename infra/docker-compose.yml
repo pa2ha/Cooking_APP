@@ -10,12 +10,14 @@ services:
   db:
     image: postgres:13
     env_file: .env
+    restart: on-failure
     volumes:
       - pg_data:/var/lib/postgresql/data
       
   backend:
-    build: ./backend/foodgram/
+    build: ../backend/foodgram/
     env_file: .env
+    restart: on-failure
     volumes:
       - STATIC:/backend_static
       - MEDIA:/media/
@@ -23,13 +25,16 @@ services:
 
   frontend:
     env_file: .env
-    build: ./frontend/
+    restart: no
+    build: ../frontend/
     command: cp -r /app/build/. /static/
     volumes:
       - STATIC:/static   
+
   gateway:
-    build: ./ngnix/
+    build: ../ngnix/
     env_file: .env
+    restart: on-failure
     volumes:
       - STATIC:/staticfiles
       - MEDIA:/media/
