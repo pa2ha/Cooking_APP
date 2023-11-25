@@ -1,10 +1,3 @@
-from django.db.models import F, Sum
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import status, viewsets
-from rest_framework.decorators import action
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.response import Response
-
 from api.filters import IngredientsFilter, RecipeFilter
 from api.permissions import IsAuthorOrAdminPermission
 from api.serializers import (FavoriteCreateSerializer,
@@ -12,7 +5,13 @@ from api.serializers import (FavoriteCreateSerializer,
                              RecipeCreateUpdateSerializer, RecipeSerializer,
                              ShoppingCartCreateSerializer,
                              ShoppingCartDeleteSerializer, TagSerializer)
+from django.db.models import F, Sum
+from django_filters.rest_framework import DjangoFilterBackend
 from recipes.models import Ingredient, Recipe, RecipeIngredients, Tag
+from rest_framework import status, viewsets
+from rest_framework.decorators import action
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
 from users.pagination import CustomPageNumberPagination
 
 from .utils import generate_pdf

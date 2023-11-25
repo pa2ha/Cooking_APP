@@ -2,7 +2,6 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
-
 from users.views import CustomUserViewSet, custom_obtain_auth_token
 
 from .views import IngredientsViewSet, RecipesViewSet, TagViewSet
