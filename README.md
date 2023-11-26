@@ -4,6 +4,8 @@
 
 Проект реализован на `Django` и `DjangoRestFramework`. Доступ к данным реализован через API-интерфейс. Документация к API написана с использованием `Redoc`.
 
+- Проект был развернут на сервере: <https://f00dgram.ddns.net/>
+
 Проект поставляется в четырех контейнерах Docker (db, frontend, backend, nginx).  
 Для запуска необходимо установить Docker и Docker Compose.
 
