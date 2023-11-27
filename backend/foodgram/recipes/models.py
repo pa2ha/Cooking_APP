@@ -164,7 +164,7 @@ class Shopping_cart(models.Model):
 
     class Meta:
         verbose_name = 'Список покупок'
-        verbose_name_plural = 'Списки Покупок'
+        verbose_name_plural = 'Списки покупок'
         ordering = ('user',)
 
     def __str__(self):
