@@ -2,7 +2,7 @@ import base64
 
 import webcolors
 from django.core.files.base import ContentFile
-from django.core.validators import MinValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.shortcuts import get_object_or_404
 from rest_framework import exceptions, serializers
 
@@ -128,6 +128,11 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
                 1,
                 message='Время приготовления должно быть 1 или более.'
             ),
+            MaxValueValidator(
+                99999,  # Замените YourMaxValue на максимальное значение
+                message=('Время приготовления не может'
+                         'превышать максимальное значение 99999.')
+            ),
         )
     )
 
@@ -149,6 +154,7 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
                     amount=amount
                 )
             )
+        RecipeIngredients.objects.filter(recipe=instance).delete()
         RecipeIngredients.objects.bulk_create(recipe_ingredients)
 
     def create(self, validated_data):
