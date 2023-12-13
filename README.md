@@ -147,12 +147,6 @@ docker-compose -f docker-compose.yml up -d
 
 Стек технологий: Python, Django, Django Rest Framework, Docker, Gunicorn, NGINX, PostgreSQL, Yandex Cloud, Continuous Integration, Continuous Deployment
 
-Авторы:
-
-[Дроздов Даниил](https://github.com/pa2ha)
+Автор: [Дроздов Даниил](https://github.com/pa2ha)
 
 
- [Татьяна Нефёдова](https://github.com/TatianaNefedova)
-
-
- [Shredincat](https://github.com/Shredincat)
