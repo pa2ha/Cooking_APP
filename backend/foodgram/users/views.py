@@ -6,6 +6,7 @@ from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.permissions import BasePermission, SAFE_METHODS
 
 from users.models import Subscription
 from users.pagination import CustomPageNumberPagination
@@ -16,6 +17,16 @@ from users.serializers import (ChangePasswordSerializer,
                                SubscriptionSerializer, UserLoginSerializer)
 
 User = get_user_model()
+
+
+class CreateOnlyPermission(BasePermission):
+
+    def has_permission(self, request, view):
+        # Разрешить только безопасные методы (GET, HEAD, OPTIONS)
+        if request.method in SAFE_METHODS:
+            return True
+        # Разрешить создание (POST)
+        return request.method == 'POST'
 
 
 class CustomUserViewSet(viewsets.ModelViewSet):
