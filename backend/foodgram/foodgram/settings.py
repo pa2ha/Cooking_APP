@@ -11,8 +11,6 @@ SECRET_KEY = os.getenv('SECRET_KEY', default='token')
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'f00dgram.onthewifi.com']
-
 
 # Application definition
 
@@ -105,7 +103,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'collected_static'
 
-MEDIA_URL = 'https://f00dgram.ddns.net/media/'
+MEDIA_URL = 'https://f00dgram.onthewifi.com/media/'
 MEDIA_ROOT = '/media/'
 
 
