@@ -30,7 +30,7 @@ class CreateOnlyPermission(BasePermission):
 
 
 class CustomUserViewSet(viewsets.ModelViewSet):
-    permission_classes = [AllowAny]
+    permission_classes = [CreateOnlyPermission]
     queryset = User.objects.all()
     pagination_class = CustomPageNumberPagination
 
