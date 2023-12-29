@@ -1,5 +1,4 @@
-# Foodrgam
-
+# Cooking_APP
 Проект представляет собой онлайн-сервис и API для него. На этом сервисе пользователи могут публиковать рецепты, подписываться на публикации других пользователей, добавлять понравившиеся рецепты в список «Избранное», а перед походом в магазин скачивать сводный список продуктов, необходимых для приготовления одного или нескольких выбранных блюд.
 
 Проект реализован на `Django` и `DjangoRestFramework`. Доступ к данным реализован через API-интерфейс. Документация к API написана с использованием `Redoc`.
@@ -150,3 +149,5 @@ docker-compose -f docker-compose.yml up -d
 Стек технологий: Python, Django, Django Rest Framework, Docker, Gunicorn, NGINX, PostgreSQL, Yandex Cloud, Continuous Integration, Continuous Deployment
 
 Автор: [Дроздов Даниил](https://github.com/pa2ha)
+
+
